@@ -1,7 +1,7 @@
 # C++ Threading 
 
 Threading concept discussed here are relavent to C++ language. It is different from OS.
-# TOPIC: Introduction to thread in c++ (c++11)
+# TOPIC: Introduction to thread in c++ (c++11)   00 cpp file
 
 - QUESTIONS
     1. What do you understand by thread and give one example in C++?
@@ -25,7 +25,7 @@ Threading concept discussed here are relavent to C++ language. It is different f
 ![alt text](./Figures/intro_thread.png)
 
 
-# TOPIC: Different Types Of Thread Creation And Calling.
+# TOPIC: Different Types Of Thread Creation And Calling. 01 cpp file
 
 There are 5 different types of creating threads in C++11 using **callable Objects**. 
 
@@ -41,7 +41,37 @@ There are 5 different types of creating threads in C++11 using **callable Object
 ![alt text](./Figures/functor_create_threads.png)
 
 4. Member function (Non_static member function) : Call a class function (non-static) using the class object. 
+
 ![alt text](./Figures/NSmember_func_create_threads.png)
 
 5. Static member function : Directly call the static memmber function.
- ![alt text](./Figures/Smember_func_create_threads.png)
+![alt text](./Figures/Smember_func_create_threads.png)
+
+# TOPIC: Use Of join(), detach() and joinable() In Thread In C++ (C++11)   02 cpp file
+
+- JOIN NOTES
+    
+    0. Once a thread is started we wait for this thread to finish by calling join() function on thread object.
+    1. Double join will result into program termination.
+    2. If needed we should check thread is joinable before joining. ( using joinable() function)
+
+![alt text](./Figures/02_join_double.png)
+
+good Cosing practicve : Joinable is a function that is used to check if the thread is joinable.
+![alt text](./Figures/02_joinable.png)
+
+- DETACH NOTES
+    
+    0. This is used to detach newly created thread from the parent thread.
+    1. Always check before detaching a thread that it is joinable otherwise we may end up double detaching and 
+    double detach() will result into program termination.
+    2. If we have detached thread and main function is returning then the detached thread execution is suspended.
+
+![alt text](./Figures/02_detach_thread.png)
+
+- NOTES:
+ 
+ Either join() or detach() should be called on thread object, otherwise during thread object's destructor it will 
+ terminate the program. Because inside destructor it checks if thread is still joinable() if yes then it terminates the program.
+
+![alt text](./Figures/02_thread_destructor_checks_for_joinable.png)
