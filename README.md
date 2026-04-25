@@ -204,3 +204,108 @@ void increment(int i) {
 }
 
 ```
+
+## TOPIC: Recursive Mutex In C++ (std::recursive_mutex)
+ 
+NOTES:
+
+0. It is same as mutex but, Same thread can lock one mutex multiple times using recursive_mutex.
+
+1. If thread T1 first call lock/try_lock on recursive mutex m1, then m1 is locked by T1, now 
+   as T1 is running in recursion T1 can call lock/try_lock any number of times there is no issue.
+
+2. But if T1 have aquired 10 times lock/try_lock on mutex m1 then thread T1 will have to unlock
+   it 10 times otherwise no other thread will be able to lock mutex m1.
+   It means recursive_mutex keeps count how many times it was locked so that many times it should be unlocked.
+
+3. How many time we can lock recursive_mutex is not defined but when that number reaches and if we were calling
+   lock() it will return std::system_error OR if we were calling try_lock() then it will return false.
+
+ ![alt text](./Figures/2_05_recursive_mutex_1.png)  
+
+  ![alt text](./Figures/2_05_recursive_mutex_2.png)  
+
+
+  ![alt text](./Figures/2_05_recursive_mutex_3.png)  
+
+BOTTOM LINE:
+
+0. It is similar to mutex but have extra facitility that it can be locked multiple time by same thread.
+1. If we can avoid recursive_mutex then we should becuase it brings overhead to the system.
+2. It can be used in loops also.
+
+
+# TOPIC: lock_guard In C++ (std::lock_guard<mutex> lock(m1))
+
+NOTES:
+
+0. It is very light weight wrapper for owning mutex on scoped basis.
+
+1. It aquires mutex lock the moment you create the object of lock_guard.
+
+2. It automatically removes the lock while goes out of scope. (destructor unlocks the lock_guard)
+
+3. You can not explicitly unlock the lock_guard.
+
+4. You can not copy lock_guard. (The lock dies with scope end.)
+
+![alt text](./Figures/3_01_std_lock_gaurd.png) 
+
+
+# TOPIC: unique_lock In C++ (std::unique_lock<mutex> lock(m1))
+
+NOTES:
+
+1. The class unique_lock is a mutex ownership wrapper.
+
+2. It Allows:
+
+   a. Can Have Different Locking Strategies
+
+   b. time-constrained attempts at locking (try_lock_for, try_lock_until)
+   
+   c. recursive locking
+   
+   d. transfer of lock ownership (move not copy)
+   
+   e. condition variables. (See this in coming videos)
+
+**Locking Strategies**
+
+| Sl. No. |  TYPE     | Effects |
+|:-----|:--------:|------:|
+| L0   | defer_lock   | do not acquire ownership of the mutex. |
+| L1   | try_to_lock  |   try to acquire ownership of the mutex without blocking. |
+| L2   | adopt_lock   |    assume the calling thread already has ownership of the mutex. |
+
+Unique_lock same as lock_guard
+![alt text](./Figures/4_std_unique_lock_2.png) 
+
+Defer_lock example - Here we declared the lock but it the mutex happens when we call **lock()**
+![alt text](./Figures/4_std_unique_lock_1.png) 
+
+# TOPIC: Condition Variable In C++ Threading
+
+- CV are used for two purposes: 
+
+  A. Notify other thread
+  
+  B. Waiting for some conditions
+
+- Condition variable allows running threads to wait on some conditions and once those conditions are met the waiting thread is notified using: 
+    
+    a. notify_one()
+    
+    b. notify_all()
+
+- You need mutex to use condition variable.
+- For threads to wait on some condition then: 
+    1. Acquire the mutex lock using std::unique_lock<mutex>
+lock(m)
+    2. Execute wait , wait_for, or wait_until.  The wait operations atomically release the mutex and suspend the execution of the thread.
+    3. When the condition varibale is notified, the thread is awakened, and the mutex is atomically reacquired. The thread should then check the condition and resume waiting if the wake up was spurious.
+
+
+NOTES:
+1. Condition variable is used to synchronize two or more threads.
+2. Best use case of condition variable is Producer/Consumer problem.
